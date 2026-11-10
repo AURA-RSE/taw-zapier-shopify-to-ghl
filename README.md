@@ -1,6 +1,6 @@
 # Shopify → GoHighLevel Customer & Order Sync
 
-> 🎥 **Loom demo (60–90s):** _[add Loom link]_
+> 🎥 **Loom demo (60–90s):** [Watch the demo](https://www.loom.com/share/5dca30c004434c25a2134a7610d14596) (silent walkthrough)
 > 📦 **Exported workflow + recorded run:** see [`/workflow`](./workflow)
 
 > **Build status:** The Zap is live with all 10 steps tested. I couldn't create a GHL account because my card was blocked, so the two GHL steps are built as API-equivalent webhook stand-ins. They send the exact contact and tag payloads to a request inspector (webhook.site), and the swap to the real LeadConnector steps is documented in [`docs/zap-blueprint.md`](./docs/zap-blueprint.md#steps-910-ghl-stand-in). The GHL workflow is specified in [`docs/ghl-workflow.md`](./docs/ghl-workflow.md).
