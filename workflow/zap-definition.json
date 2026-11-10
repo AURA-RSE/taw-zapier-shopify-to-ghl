@@ -1,0 +1,129 @@
+{
+  "_note": "Step-by-step definition of the live Zap, written from the Zapier editor. Zapier's own export (Settings → Data management → Export Zaps) can be added alongside as zap-export.json.",
+  "name": "TAW | Shopify → GHL Order Sync",
+  "zap_id": 386104489,
+  "status": "on",
+  "steps": [
+    {
+      "n": 1,
+      "app": "Shopify",
+      "event": "New Paid Order",
+      "type": "trigger"
+    },
+    {
+      "n": 2,
+      "app": "Code by Zapier",
+      "event": "Run JavaScript",
+      "purpose": "normalise email/phone/total, products list, SKU-prefix category tags",
+      "code_ref": "docs/zap-blueprint.md#step-2--normalise"
+    },
+    {
+      "n": 3,
+      "app": "Google Sheets",
+      "event": "Lookup Spreadsheet Rows (Advanced)",
+      "config": {
+        "worksheet": "Orders",
+        "lookup_column": "email",
+        "lookup_value": "{{2.email}}",
+        "max_rows": 50,
+        "success_if_none": true
+      }
+    },
+    {
+      "n": 4,
+      "app": "Code by Zapier",
+      "event": "Run JavaScript",
+      "purpose": "duplicate check, buyer type, final tag list",
+      "code_ref": "docs/zap-blueprint.md#step-4--dedupe--tags"
+    },
+    {
+      "n": 5,
+      "app": "Filter by Zapier",
+      "conditions": [
+        [
+          "4.is_duplicate",
+          "is false"
+        ],
+        [
+          "2.has_email",
+          "is true"
+        ]
+      ],
+      "logic": "AND"
+    },
+    {
+      "n": 6,
+      "app": "AI by Zapier",
+      "event": "Analyze and return data",
+      "output_field": "message",
+      "prompt_ref": "docs/zap-blueprint.md#step-6--ai-prompt"
+    },
+    {
+      "n": 7,
+      "app": "Formatter by Zapier",
+      "event": "Text → Default Value",
+      "input": "{{6.message}}",
+      "default": "Thank you for your order! We hope you love it, and we'd be glad to see you again soon."
+    },
+    {
+      "n": 8,
+      "app": "Google Sheets",
+      "event": "Create Spreadsheet Row",
+      "config": {
+        "worksheet": "Orders"
+      }
+    },
+    {
+      "n": 9,
+      "app": "Webhooks by Zapier",
+      "event": "POST",
+      "title": "GHL stand-in: Create/Update Contact",
+      "url": "{GHL_STANDIN_WEBHOOK_URL}/ghl/contacts/upsert",
+      "payload_type": "json",
+      "data": {
+        "email": "{{2.email}}",
+        "phone": "{{2.phone}}",
+        "firstName": "{{2.first_name}}",
+        "lastName": "{{2.last_name}}",
+        "source": "Shopify",
+        "last_order_id": "{{2.order_id}}",
+        "last_order_total": "{{2.total}}",
+        "last_products": "{{2.products}}",
+        "total_orders": "{{4.total_orders}}",
+        "post_purchase_message": "{{7.output}}"
+      }
+    },
+    {
+      "n": 10,
+      "app": "Webhooks by Zapier",
+      "event": "POST",
+      "title": "GHL stand-in: Add Tags",
+      "url": "{GHL_STANDIN_WEBHOOK_URL}/ghl/contacts/tags",
+      "payload_type": "json",
+      "data": {
+        "email": "{{2.email}}",
+        "tags": "{{4.tags}}"
+      }
+    }
+  ],
+  "error_zap": {
+    "name": "TAW | Zap Error Logger",
+    "zap_id": 386105860,
+    "status": "on",
+    "steps": [
+      {
+        "n": 1,
+        "app": "Zapier Manager",
+        "event": "New Zap Error"
+      },
+      {
+        "n": 2,
+        "app": "Google Sheets",
+        "event": "Create Spreadsheet Row",
+        "config": {
+          "worksheet": "Errors"
+        }
+      }
+    ]
+  }
+}
