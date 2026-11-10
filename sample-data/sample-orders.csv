@@ -1,0 +1,6 @@
+order_ref,first_name,last_name,email,phone,product,product_type,qty,unit_price,currency,scenario
+T-1001,Ada,Okafor,ada.test@example.com,+15555550101,Vitamin C Serum,Skincare,1,45.00,USD,First-time buyer
+T-1002,Ada,Okafor,ada.test@example.com,+15555550101,Hydrating Cleanser,Skincare,2,30.00,USD,Repeat buyer (same email)
+T-1003,Tunde,Bello,tunde.test@example.com,,Linen Shirt,Apparel,2,65.00,USD,High value (>=100) + no phone
+T-1004,Grace,Mensah,GRACE.Test@Example.com,+15555550102,Canvas Tote,Accessories,1,20.00,USD,Uppercase email (tests normalisation)
+T-1005,Sam,Doe,sam.test@example.com,+15555550103,Gift Card,,1,25.00,USD,Missing product type (no category tag)

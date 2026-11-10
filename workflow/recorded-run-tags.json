@@ -1,0 +1,11 @@
+{
+  "step": "10. GHL stand-in: Add Tags",
+  "method": "POST",
+  "path": "/ghl/contacts/tags",
+  "recorded_at": "2026-11-10T09:07:13Z",
+  "user_agent": "Zapier",
+  "body": {
+    "email": "ada.test@example.com",
+    "tags": "shopify-customer,repeat-buyer,cat-skincare"
+  }
+}
