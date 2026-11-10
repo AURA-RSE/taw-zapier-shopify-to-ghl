@@ -42,7 +42,7 @@ const isDuplicate = prevIds.includes(orderId);
 const prevCount = prevIds.length;
 const buyerType = prevCount === 0 ? 'first-time-buyer' : 'repeat-buyer';
 const tags = ['shopify-customer', buyerType];
-if (String(inputData.is_high_value) === 'true') tags.push('high-value');
+if (String(inputData.is_high_value).toLowerCase() === 'true') tags.push('high-value'); // Zapier passes booleans as "True"
 (inputData.category_tags || '').split(',').map(s => s.trim()).filter(Boolean).forEach(t => tags.push(t));
 return {is_duplicate: isDuplicate, previous_orders: prevCount, total_orders: prevCount + 1, buyer_type: buyerType, tags: tags.join(',')};
 ```
