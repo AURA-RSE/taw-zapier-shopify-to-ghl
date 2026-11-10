@@ -1,0 +1,539 @@
+{
+  "metadata": {
+    "version": "gdpr_v1"
+  },
+  "zaps": [
+    {
+      "id": 386104489,
+      "title": "TAW | Shopify → GHL Order Sync",
+      "status": "on",
+      "nodes": {
+        "386104489": {
+          "id": 386104489,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": false,
+          "type_of": "read",
+          "params": {},
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            }
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": null,
+          "root_id": null,
+          "action": "new_paid_order_v3",
+          "selected_api": "ShopifyCLIAPI@6.5.0",
+          "title": "TAW | Shopify → GHL Order Sync",
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-08T12:59:53+00:00",
+          "last_changed": "2026-11-10T08:07:39+00:00"
+        },
+        "386104490": {
+          "id": 386104490,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": true,
+          "type_of": "write",
+          "params": {
+            "packages_enabled": false,
+            "input": {
+              "email": "{{=gives[\"386104489\"][\"email\"]}}",
+              "order_id": "{{=gives[\"386104489\"][\"admin_graphql_api_id\"]}}",
+              "order_number": "{{=gives[\"386104489\"][\"name\"]}}",
+              "first_name": "{{=gives[\"386104489\"][\"customer\"][\"firstName\"]}}",
+              "last_name": "{{=gives[\"386104489\"][\"customer\"][\"lastName\"]}}",
+              "phone": "{{=gives[\"386104489\"][\"phone\"]}}",
+              "total": "{{=gives[\"386104489\"][\"totalPriceSet\"][\"shopMoney\"][\"amount\"]}}",
+              "currency": "{{=gives[\"386104489\"][\"currencyCode\"]}}",
+              "titles": "{{=gives[\"386104489\"][\"lineItems[]title\"]}}",
+              "skus": "{{=gives[\"386104489\"][\"lineItems[]sku\"]}}"
+            },
+            "code": "// Step 2: normalise Shopify order data\nconst email = (inputData.email || '').trim().toLowerCase();\nconst phone = (inputData.phone || '').replace(/[^\\d+]/g, '');\nconst total = parseFloat(inputData.total || '0') || 0;\nconst skus = (inputData.skus || '').split(',').map(s => s.trim()).filter(Boolean);\nconst catMap = {SKIN: 'skincare', APP: 'apparel', ACC: 'accessories'};\nconst cats = [...new Set(skus.map(s => catMap[s.split('-')[0].toUpperCase()]).filter(Boolean))];\nconst products = (inputData.titles || '').split(',').map(s => s.trim()).filter(Boolean).join(', ');\nreturn {email: email, phone: phone, has_email: email.includes('@'), has_phone: phone.length > 6, total: total.toFixed(2), currency: inputData.currency || 'USD', order_id: inputData.order_id, order_number: inputData.order_number, first_name: inputData.first_name || 'there', last_name: inputData.last_name || '', products: products, skus: skus.join(', '), category_tags: cats.map(c => 'cat-' + c).join(','), is_high_value: total >= 100};"
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            },
+            "parammap": {}
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 386104489,
+          "root_id": 386104489,
+          "action": "01929fad-d3dd-62c2-52ed-7868d5fcc691",
+          "selected_api": "CodeCLIAPI@1.0.1",
+          "title": null,
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-08T12:59:53+00:00",
+          "last_changed": "2026-11-10T08:07:39+00:00"
+        },
+        "386105079": {
+          "id": 386105079,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": true,
+          "type_of": "search",
+          "params": {
+            "row_count": "50",
+            "_zap_search_success_on_miss": true,
+            "_zap_search_multiple_results": "group",
+            "spreadsheet": "<GOOGLE_SHEET_ID>",
+            "worksheet": "0",
+            "lookup_key": "COL$D",
+            "lookup_value": "{{=gives[\"386104490\"][\"email\"]}}"
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            },
+            "parammap": {
+              "spreadsheet": "TAW - Shopify to GHL Order Log",
+              "worksheet": "Orders",
+              "lookup_key": "email"
+            }
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 386104490,
+          "root_id": 386104489,
+          "action": "find_many_rows",
+          "selected_api": "GoogleSheetsV2CLIAPI@2.17.3",
+          "title": null,
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-08T13:26:08+00:00",
+          "last_changed": "2026-11-10T08:07:39+00:00"
+        },
+        "386105237": {
+          "id": 386105237,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": true,
+          "type_of": "write",
+          "params": {
+            "packages_enabled": false,
+            "input": {
+              "order_id": "{{=gives[\"386104490\"][\"order_id\"]}}",
+              "prev_ids": "{{=gives['386105079'][\"results[]rows[]COL$A\"]}}",
+              "category_tags": "{{=gives[\"386104490\"][\"category_tags\"]}}",
+              "is_high_value": "{{=gives[\"386104490\"][\"is_high_value\"]}}"
+            },
+            "code": "// Step 4: duplicate check, buyer type and tags\nconst orderId = String(inputData.order_id || '');\nconst prevIds = (inputData.prev_ids || '').split(',').map(s => s.trim()).filter(Boolean);\nconst isDuplicate = prevIds.includes(orderId);\nconst prevCount = prevIds.length;\nconst buyerType = prevCount === 0 ? 'first-time-buyer' : 'repeat-buyer';\nconst tags = ['shopify-customer', buyerType];\nif (String(inputData.is_high_value) === 'true') tags.push('high-value');\n(inputData.category_tags || '').split(',').map(s => s.trim()).filter(Boolean).forEach(t => tags.push(t));\nreturn {is_duplicate: isDuplicate, previous_orders: prevCount, total_orders: prevCount + 1, buyer_type: buyerType, tags: tags.join(',')};"
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            },
+            "parammap": {}
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 386105079,
+          "root_id": 386104489,
+          "action": "01929fad-d3dd-62c2-52ed-7868d5fcc691",
+          "selected_api": "CodeCLIAPI@1.0.1",
+          "title": null,
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-08T13:29:53+00:00",
+          "last_changed": "2026-11-10T08:07:39+00:00"
+        },
+        "386105361": {
+          "id": 386105361,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": true,
+          "type_of": "filter",
+          "params": {
+            "filter_criteria": [
+              {
+                "id": 1699262714221105,
+                "group": 994561804233704,
+                "key": "{{=gives['386105237'][\"is_duplicate\"]}}",
+                "value": "",
+                "match": "boolean",
+                "action": "stop"
+              },
+              {
+                "id": 8202626013982118,
+                "group": 994561804233704,
+                "key": "{{=gives[\"386104490\"][\"has_email\"]}}",
+                "value": "",
+                "match": "boolean",
+                "action": "continue"
+              }
+            ]
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            }
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 386105237,
+          "root_id": 386104489,
+          "action": "filter",
+          "selected_api": "FilterAPI",
+          "title": null,
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-08T13:33:13+00:00",
+          "last_changed": "2026-11-10T08:07:39+00:00"
+        },
+        "386105451": {
+          "id": 386105451,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": true,
+          "type_of": "write",
+          "params": {
+            "api_branch_name": "",
+            "authentication_id": "<redacted>",
+            "model_id": "standard/auto",
+            "isOutputArray": false,
+            "instructions": "You write short post-purchase messages for an online store. Write a warm 2-sentence thank-you to the customer that mentions what they bought and suggests one related product category to try next. Rules: under 50 words, no discount codes, no emojis, no subject line, plain text only. If the buyer type is repeat-buyer, thank them for coming back. Customer first name: {{=gives[\"386104490\"][\"first_name\"]}}. Items bought: {{=gives[\"386104490\"][\"products\"]}}. Buyer type: {{=gives['386105237'][\"buyer_type\"]}}. Return only the message.",
+            "outputFields": [
+              {
+                "name": "message",
+                "description": "The finished 2-sentence thank-you message to send to the customer, under 50 words, plain text.",
+                "type": "text",
+                "isRequired": true
+              }
+            ]
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false,
+              "$prompt_strength": {
+                "fingerprint": 8443843395279819,
+                "result": {
+                  "status": "scored",
+                  "criteria": {
+                    "task": true,
+                    "data": true,
+                    "output": true,
+                    "rules": true
+                  },
+                  "criteria_met": 4,
+                  "strength": "strong"
+                }
+              },
+              "$ai_step_title": {
+                "title": "Craft post-purchase thank-you message",
+                "prompt_hash": 851435580,
+                "prompt_length": 541
+              }
+            },
+            "parammap": {
+              "authentication_id": "<redacted>",
+              "model_id": "standard/auto"
+            },
+            "stepTitle": "Craft post-purchase thank-you message"
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 386105361,
+          "root_id": 386104489,
+          "action": "get_completion",
+          "selected_api": "AICLIAPI@4.0.35",
+          "title": null,
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-08T13:36:59+00:00",
+          "last_changed": "2026-11-10T08:07:39+00:00"
+        },
+        "386105533": {
+          "id": 386105533,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": true,
+          "type_of": "write",
+          "params": {
+            "transform": "string.default_value_v2",
+            "inputs": "{{=gives['386105451'][\"message\"]}}",
+            "default_value": "Thank you for your order! We hope you love it, and we'd be glad to see you again soon."
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            },
+            "parammap": {
+              "transform": "Default Value"
+            },
+            "stepTitle": "Text"
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 386105451,
+          "root_id": 386104489,
+          "action": "text_line_item",
+          "selected_api": "ZapierFormatterCLIAPI@1.0.8",
+          "title": null,
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-08T13:40:52+00:00",
+          "last_changed": "2026-11-10T08:07:39+00:00"
+        },
+        "386105575": {
+          "id": 386105575,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": true,
+          "type_of": "write",
+          "params": {
+            "timezone": false,
+            "spreadsheet": "<GOOGLE_SHEET_ID>",
+            "worksheet": "0",
+            "COL$A": "{{=gives[\"386104490\"][\"order_id\"]}}",
+            "COL$B": "{{=gives[\"386104490\"][\"order_number\"]}}",
+            "COL$C": "{{=gives[\"386104489\"][\"processedAt\"]}}",
+            "COL$D": "{{=gives[\"386104490\"][\"email\"]}}",
+            "COL$E": "{{=gives[\"386104490\"][\"first_name\"]}}",
+            "COL$F": "{{=gives[\"386104490\"][\"last_name\"]}}",
+            "COL$G": "{{=gives[\"386104490\"][\"phone\"]}}",
+            "COL$H": "{{=gives[\"386104490\"][\"total\"]}}",
+            "COL$I": "{{=gives[\"386104490\"][\"currency\"]}}",
+            "COL$J": "{{=gives[\"386104490\"][\"products\"]}}",
+            "COL$K": "{{=gives[\"386104490\"][\"skus\"]}}",
+            "COL$L": "{{=gives['386105237'][\"buyer_type\"]}}",
+            "COL$N": "{{=meta[\"utc_iso\"]}}"
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            },
+            "parammap": {
+              "spreadsheet": "TAW - Shopify to GHL Order Log",
+              "worksheet": "Orders"
+            }
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 386105533,
+          "root_id": 386104489,
+          "action": "add_row",
+          "selected_api": "GoogleSheetsV2CLIAPI@2.17.3",
+          "title": null,
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-08T13:42:51+00:00",
+          "last_changed": "2026-11-10T08:07:39+00:00"
+        },
+        "386274459": {
+          "id": 386274459,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": true,
+          "type_of": "write",
+          "params": {
+            "payload_type": "json",
+            "wrap_in_array": false,
+            "unflatten": true,
+            "extract_variables": true,
+            "url": "{GHL_STANDIN_WEBHOOK_URL}/ghl/contacts/upsert",
+            "data": {
+              "email": "{{=gives[\"386104490\"][\"email\"]}}",
+              "phone": "{{=gives[\"386104490\"][\"phone\"]}}",
+              "firstName": "{{=gives[\"386104490\"][\"first_name\"]}}",
+              "lastName": "{{=gives[\"386104490\"][\"last_name\"]}}",
+              "source": "Shopify",
+              "last_order_id": "{{=gives[\"386104490\"][\"order_id\"]}}",
+              "last_order_total": "{{=gives[\"386104490\"][\"total\"]}}",
+              "last_products": "{{=gives[\"386104490\"][\"products\"]}}",
+              "total_orders": "{{=gives['386105237'][\"total_orders\"]}}",
+              "post_purchase_message": "{{=gives['386105533'][\"output\"]}}"
+            }
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            },
+            "parammap": {},
+            "stepTitle": "GHL stand-in: Create/Update Contact"
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 386105575,
+          "root_id": 386104489,
+          "action": "post",
+          "selected_api": "WebHookCLIAPI@1.2.0",
+          "title": null,
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-10T07:59:04+00:00",
+          "last_changed": "2026-11-10T08:07:39+00:00"
+        },
+        "386274757": {
+          "id": 386274757,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": true,
+          "type_of": "write",
+          "params": {
+            "payload_type": "json",
+            "wrap_in_array": false,
+            "unflatten": true,
+            "extract_variables": true,
+            "url": "{GHL_STANDIN_WEBHOOK_URL}/ghl/contacts/tags",
+            "data": {
+              "email": "{{=gives[\"386104490\"][\"email\"]}}",
+              "tags": "{{=gives['386105237'][\"tags\"]}}"
+            }
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            },
+            "parammap": {},
+            "stepTitle": "GHL stand-in: Add Tags"
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 386274459,
+          "root_id": 386104489,
+          "action": "post",
+          "selected_api": "WebHookCLIAPI@1.2.0",
+          "title": null,
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-10T08:05:11+00:00",
+          "last_changed": "2026-11-10T08:07:39+00:00"
+        }
+      }
+    },
+    {
+      "id": 386105860,
+      "title": "TAW | Zap Error Logger",
+      "status": "on",
+      "nodes": {
+        "386105860": {
+          "id": 386105860,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": false,
+          "type_of": "read",
+          "params": {},
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            }
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": null,
+          "root_id": null,
+          "action": "zap_error_alert",
+          "selected_api": "ZapierManagerCLIAPI@1.7.1",
+          "title": "TAW | Zap Error Logger",
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-08T13:53:44+00:00",
+          "last_changed": "2026-11-08T14:00:26+00:00"
+        },
+        "386105861": {
+          "id": 386105861,
+          "account_id": "<redacted>",
+          "customuser_id": "<redacted>",
+          "paused": true,
+          "type_of": "write",
+          "params": {
+            "timezone": false,
+            "spreadsheet": "<GOOGLE_SHEET_ID>",
+            "worksheet": "1781925662",
+            "COL$A": "{{=meta[\"utc_iso\"]}}",
+            "COL$B": "{{=gives[\"386105860\"][\"title\"]}}",
+            "COL$C": "{{=gives[\"386105860\"][\"service\"]}}",
+            "COL$D": "{{=gives[\"386105860\"][\"message\"]}}",
+            "COL$E": "{{=gives[\"386105860\"][\"zap_run_link\"]}}"
+          },
+          "meta": {
+            "$editor": {
+              "has_automatic_issues": false
+            },
+            "parammap": {
+              "spreadsheet": "TAW - Shopify to GHL Order Log",
+              "worksheet": "Errors"
+            }
+          },
+          "triple_stores": {
+            "copied_from": null,
+            "created_by": null,
+            "polling_interval_override": 0,
+            "block_and_release_limit_override": 0,
+            "spread_tasks": 1
+          },
+          "folders": null,
+          "parent_id": 386105860,
+          "root_id": 386105860,
+          "action": "add_row",
+          "selected_api": "GoogleSheetsV2CLIAPI@2.17.3",
+          "title": null,
+          "authentication_id": "<redacted>",
+          "created_at": "2026-11-08T13:53:44+00:00",
+          "last_changed": "2026-11-08T14:00:25+00:00"
+        }
+      }
+    }
+  ]
+}
