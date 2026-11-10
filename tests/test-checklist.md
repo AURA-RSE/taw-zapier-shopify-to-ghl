@@ -8,7 +8,7 @@ Live tests used real Shopify test orders on 10 Nov 2026. Each was checked in Zap
 - [x] Order row logged to the `Orders` sheet (step 8 succeeded in every run)
 - [x] AI thank-you message present in the step 9 payload
 - [x] **#1003 Repeat buyer (Tolu again):** same email (GHL upserts by email, so no duplicate contact); tag `repeat-buyer`; Total Orders = 2
-- [x] **#1005 High value ($180, Kemi):** found a bug. The `high-value` tag was missing because Zapier passes booleans between Code steps as `"True"` and step 4 only matched `"true"`. Fixed in Zap v2 with a case-insensitive check. Re-tested live on v2 with Kemi's second order ($135): tags `shopify-customer,repeat-buyer,high-value,cat-skincare` ✅
+- [x] **#1005 High value ($180, Kemi):** found a bug. The `high-value` tag was missing because Zapier passes booleans between Code steps as `"True"` and step 4 only matched `"true"`. Fixed in Zap v2 with a case-insensitive check. Re-tested live on v2 with Kemi's second order (over $100): tags `shopify-customer,repeat-buyer,high-value,cat-skincare` ✅
 
 ## Edge cases / empty states
 - [x] **#1004 No phone (Bayo):** contact payload has no `phone` field; run still successful
