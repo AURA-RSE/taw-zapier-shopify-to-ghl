@@ -1,5 +1,5 @@
 {
-  "_note": "Step-by-step definition of the live Zap, written from the Zapier editor. Zapier's own export (Settings → Data management → Export Zaps) can be added alongside as zap-export.json.",
+  "_note": "Step-by-step definition of the live Zap, written from the Zapier editor. Zapier's own export is in zap-export.json.",
   "name": "TAW | Shopify → GHL Order Sync",
   "zap_id": 386104489,
   "status": "on",
