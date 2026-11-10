@@ -1,0 +1,19 @@
+{
+  "step": "9. GHL stand-in: Create/Update Contact",
+  "method": "POST",
+  "path": "/ghl/contacts/upsert",
+  "recorded_at": "2026-11-10T09:04:38Z",
+  "user_agent": "Zapier",
+  "body": {
+    "email": "ada.test@example.com",
+    "firstName": "Ada",
+    "lastName": "Okafor",
+    "phone": "+12015550101",
+    "source": "Shopify",
+    "last_order_id": "gid://shopify/Order/19464012202225",
+    "last_order_total": "45.00",
+    "last_products": "Vitamin C Serum",
+    "total_orders": "2",
+    "post_purchase_message": "Thanks for coming back, Ada, and choosing our Vitamin C Serum. We hope you love it—explore our hydrating moisturizers next for a complementary skincare step."
+  }
+}
